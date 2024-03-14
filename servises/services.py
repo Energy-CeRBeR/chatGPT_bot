@@ -1,9 +1,6 @@
-import g4f
-
-providers = [provider for provider in g4f.Provider.__providers__ if provider.working]
-
-for provider in providers:
-    try:
-        response = g4f.ChatCompletion.create(
-            model="gpt"
-        )
+def offset_history(history, max_length=4096):
+    current_length = sum(len(message["content"]) for message in history)
+    while history and current_length > max_length:
+        removed_message = history.pop(0)
+        current_length -= len(removed_message["content"])
+    return history

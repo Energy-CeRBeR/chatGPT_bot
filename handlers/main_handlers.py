@@ -8,16 +8,9 @@ from aiogram.types import Message
 
 from lexicon.lexicon import LEXICON, LEXICON_COMMANDS
 from database.database import users_db, user_db_template
+from servises.services import offset_history
 
 router = Router()
-
-
-def offset_history(history, max_length=4096):
-    current_length = sum(len(message["content"]) for message in history)
-    while history and current_length > max_length:
-        removed_message = history.pop(0)
-        current_length -= len(removed_message["content"])
-    return history
 
 
 @router.message(CommandStart())
@@ -66,6 +59,8 @@ async def request_handler(message: Message):
                 provider=provider,
             )
             chat_gpt_response = response
+            if "[GoogleGenerativeAI Error]" in response or len(response) == 0:
+                continue
             print(response)
             print(provider, "GOOD")
             break

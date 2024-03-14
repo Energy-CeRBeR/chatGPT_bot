@@ -3,4 +3,3 @@ requests
 python-dotenv
 environs
 g4f
-curl_cffi

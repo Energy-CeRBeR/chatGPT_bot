@@ -8,7 +8,7 @@ from handlers.main_handlers import router as main_router
 
 async def main():
     config: Config = load_config(".env")
-    bot = Bot(token=config.tg_bot.token, parse_mode='HTML')
+    bot = Bot(token=config.tg_bot.token)
     dp = Dispatcher()
 
     dp.include_router(main_router)
