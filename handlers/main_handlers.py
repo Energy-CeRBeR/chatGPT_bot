@@ -48,7 +48,6 @@ async def request_handler(message: Message):
     chat_history = users_db[message.from_user.id]["conversation_history"]
 
     providers = [provider for provider in g4f.Provider.__providers__ if provider.working]
-
     chat_gpt_response = LEXICON["get_error"]
     for provider in providers:
         print(provider)
