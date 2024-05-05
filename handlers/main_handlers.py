@@ -64,7 +64,7 @@ async def request_handler(message: Message):
             print(provider, "GOOD")
             break
         except Exception as e:
-            print(f"{provider.__name__}:", e)
+            print(f"{provider.__name__}:", e, "ERROR")
             chat_gpt_response = LEXICON["get_error"]
 
     users_db[message.from_user.id]["conversation_history"].append({"role": "assistant", "content": chat_gpt_response})
