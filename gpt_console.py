@@ -13,39 +13,54 @@ def offset_history(history, max_length=4096):
 
 async def process():
     conversation_history = list()
-    user_query = "start"
-    while user_query != "break":
-        user_query = input("Введите ваш запрос: ")
-        conversation_history.append({"role": "user", "content": user_query})
-        conversation_history = offset_history(conversation_history)
-        chat_history = conversation_history
+    INPUT_PATH = "start"
+    while INPUT_PATH != "break":
+        try:
+            INPUT_PATH = input("Введите путь к .txt файлу с запросом: ")
+            with open(INPUT_PATH, encoding="UTF-8") as INPUT_FILE:
+                text = INPUT_FILE.read().strip()
+        except FileNotFoundError:
+            print("Файл не найден!")
+            continue
 
-        providers = [provider for provider in g4f.Provider.__providers__ if provider.working]
-        chat_gpt_response = "error"
-        for provider in providers:
-            print(provider)
-            try:
-                response = await g4f.ChatCompletion.create_async(
-                    model=g4f.models.default,
-                    messages=chat_history,
-                    provider=provider,
-                )
-                chat_gpt_response = response
-                if "[GoogleGenerativeAI Error]" in response or len(response) == 0:
-                    continue
-                print(provider, "GOOD")
-                break
-            except Exception as e:
-                print(f"{provider.__name__}:", e)
-                chat_gpt_response = "error"
+        if text:
+            print(f"QUERY: {text}")
+            conversation_history.append({"role": "user", "content": text})
+            conversation_history = offset_history(conversation_history)
+            chat_history = conversation_history
 
-        conversation_history.append({"role": "assistant", "content": chat_gpt_response})
+            providers = [provider for provider in g4f.Provider.__providers__ if provider.working]
+            chat_gpt_response = "error"
+            for provider in providers:
+                print(provider)
+                try:
+                    response = await g4f.ChatCompletion.create_async(
+                        model=g4f.models.default,
+                        messages=chat_history,
+                        provider=provider,
+                    )
+                    chat_gpt_response = response
+                    if "[GoogleGenerativeAI Error]" in response or len(response) == 0:
+                        continue
+                    print(provider, "GOOD")
+                    break
+                except Exception as e:
+                    print(f"{provider.__name__}:", e)
+                    chat_gpt_response = "error"
 
-        print(conversation_history)
-        print(chat_gpt_response)
+            conversation_history.append({"role": "assistant", "content": chat_gpt_response})
+
+            print(conversation_history)
+            print()
+            print("################################################################")
+            print(chat_gpt_response)
+            print("################################################################")
+
+        else:
+            print("Пустой запрос / ошибка")
+
+        print()
 
 
 if __name__ == "__main__":
     asyncio.run(process())
-
-
